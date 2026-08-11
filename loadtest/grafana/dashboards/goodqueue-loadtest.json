@@ -1,0 +1,1183 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Технические и продуктовые метрики нагрузочных прогонов очереди GoodQueue.",
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Количество HTTP-запросов в выбранном прогоне и временном диапазоне.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed-color"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_http_reqs_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "requests",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Всего запросов",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Доля HTTP-запросов без ошибки k6. Продуктовые ожидаемые 4xx учитываются сценарием отдельно.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 99
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "(100 * sum(last_over_time(k6_http_reqs_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\", expected_response=\"true\"}[$__range])) / clamp_min(sum(last_over_time(k6_http_reqs_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])), 1)) or vector(0)",
+          "instant": true,
+          "legendFormat": "success",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Успешность HTTP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Худший p95 полной длительности среди endpoint-ов выбранного прогона.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "(1000 * max(last_over_time(k6_http_req_duration_p95{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range]))) or vector(0)",
+          "instant": true,
+          "legendFormat": "p95",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Задержка p95",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Покупки среди завершённых purchase/cancel/checkout-expired исходов. Активные попытки не портят конверсию.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 75
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "(100 * sum(last_over_time(k6_purchased_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) / clamp_min(sum(last_over_time(k6_purchased_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) + sum(last_over_time(k6_cancelled_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) + sum(last_over_time(k6_checkout_expired_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])), 1)) or vector(0)",
+          "instant": true,
+          "legendFormat": "conversion",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "title": "Конверсия в покупку",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "requests/s",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_http_reqs_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "RPS",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Пропускная способность",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "milliseconds",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "1000 * avg(k6_http_req_duration_avg{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "avg",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "1000 * max(k6_http_req_duration_p95{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "p95",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "1000 * max(k6_http_req_duration_p99{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "p99",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Задержка HTTP",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Финальные продуктовые исходы purchase-сценария. Значения берутся по последней точке каждого ряда, поэтому завершённые прогоны не исчезают из обзора.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 7,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_purchased_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "purchased",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_cancelled_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "cancelled",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_checkout_expired_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "checkout expired",
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_queue_rejected_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "queue rejected",
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_sold_out_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "sold out",
+          "range": false,
+          "refId": "E"
+        }
+      ],
+      "title": "Продуктовые исходы",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "observations/s",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": true,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_state_waiting_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "waiting",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_state_invited_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "invited",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_state_checkout_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "checkout",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_state_terminal_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "terminal",
+          "range": true,
+          "refId": "D"
+        }
+      ],
+      "title": "Наблюдаемые состояния очереди",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Успешность отдельных действий сценария. Пустая серия означает, что действие не выполнялось в выбранном сценарии.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "success, %",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 99
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "100 * avg(k6_join_success_rate{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "join",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "100 * avg(k6_current_success_rate{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "polling",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "100 * avg(k6_checkout_success_rate{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "checkout",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "editorMode": "code",
+          "expr": "100 * avg(k6_cancel_success_rate{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "cancel",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "editorMode": "code",
+          "expr": "100 * avg(k6_payment_success_rate{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "payment",
+          "range": true,
+          "refId": "E"
+        }
+      ],
+      "title": "Успешность операций",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Ошибки, которые не являются ожидаемой частью сценария, и незавершённые продуктовые исходы.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      },
+      "id": 10,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_unexpected_4xx_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "unexpected 4xx",
+          "range": false,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_unexpected_5xx_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "unexpected 5xx",
+          "range": false,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_action_errors_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "action errors",
+          "range": false,
+          "refId": "C"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_outcome_mismatches_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "outcome mismatches",
+          "range": false,
+          "refId": "D"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(last_over_time(k6_unresolved_outcomes_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__range])) or vector(0)",
+          "instant": true,
+          "legendFormat": "unresolved",
+          "range": false,
+          "refId": "E"
+        }
+      ],
+      "title": "Ошибки и расхождения",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "VUs",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(k6_vus{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "active VUs",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(k6_vus_max{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"})",
+          "legendFormat": "planned max",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Виртуальные пользователи",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Частота неожиданных отказов. Для стабильного прогона линия должна оставаться на нуле.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "errors/s",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.001
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": true,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.6",
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_unexpected_4xx_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "unexpected 4xx",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_unexpected_5xx_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "unexpected 5xx",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "editorMode": "code",
+          "expr": "sum(rate(k6_action_errors_total{testid=~\"$testid\", loadtest_scenario=~\"$scenario\"}[$__rate_interval]))",
+          "legendFormat": "action errors",
+          "range": true,
+          "refId": "C"
+        }
+      ],
+      "title": "Ошибки во времени",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": [
+    "goodqueue",
+    "k6",
+    "loadtest"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(k6_http_reqs_total, testid)",
+        "includeAll": true,
+        "label": "Прогон",
+        "multi": true,
+        "name": "testid",
+        "options": [],
+        "query": {
+          "query": "label_values(k6_http_reqs_total, testid)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 2,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(k6_http_reqs_total{testid=~\"$testid\"}, loadtest_scenario)",
+        "includeAll": true,
+        "label": "Сценарий",
+        "multi": true,
+        "name": "scenario",
+        "options": [],
+        "query": {
+          "query": "label_values(k6_http_reqs_total{testid=~\"$testid\"}, loadtest_scenario)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "6h",
+      "24h",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "GoodQueue — нагрузка и конверсия",
+  "uid": "goodqueue-loadtest",
+  "version": 1,
+  "weekStart": "monday"
+}
